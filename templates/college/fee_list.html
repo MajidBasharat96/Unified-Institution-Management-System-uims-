@@ -7,27 +7,40 @@
   <div class="card-header"><div class="card-title">All Fee Records ({{ fees.count }})</div></div>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Receipt #</th><th>Student</th><th>Fee Type</th><th>Amount</th><th>Paid</th><th>Balance</th><th>Due Date</th><th>Status</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Receipt #</th><th>Student</th><th>Fee Type</th>
+          <th>Amount</th><th>Paid</th><th>Balance</th>
+          <th>Due Date</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
       <tbody>
         {% for f in fees %}
         <tr>
           <td><span class="badge gray">{{ f.receipt_number }}</span></td>
-          <td><strong>{{ f.student.first_name }} {{ f.student.last_name }}</strong><br><span style="font-size:11px;color:#6b6b65;">{{ f.student.roll_number }}</span></td>
+          <td>
+            <strong>{{ f.student.first_name }} {{ f.student.last_name }}</strong><br>
+            <span style="font-size:11px;color:#6b6b65;">{{ f.student.roll_number }}</span>
+          </td>
           <td>{{ f.get_fee_type_display }}</td>
           <td>PKR {{ f.amount }}</td>
           <td style="color:#15803d;">PKR {{ f.paid_amount }}</td>
-          <td style="color:{% if f.balance > 0 %}#dc2626{% else %}#15803d{% endif };font-weight:500;">PKR {{ f.balance }}</td>
+          <td style="color:{% if f.balance > 0 %}#dc2626{% else %}#15803d{% endif %};font-weight:500;">PKR {{ f.balance }}</td>
           <td style="font-family:'DM Mono',monospace;font-size:12px;">{{ f.due_date }}</td>
           <td>
             {% if f.status == 'paid' %}<span class="badge green">Paid</span>
             {% elif f.status == 'pending' %}<span class="badge amber">Pending</span>
             {% elif f.status == 'overdue' %}<span class="badge red">Overdue</span>
             {% elif f.status == 'partial' %}<span class="badge blue">Partial</span>
-            {% else %}<span class="badge gray">{{ f.get_status_display }}</span>{% endif %}
+            {% else %}<span class="badge gray">{{ f.get_status_display }}</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'fee_delete' f.pk %}" class="btn sm danger">Delete</a>
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="8" style="text-align:center;padding:30px;color:#9e9e98;">No fee records yet.</td></tr>
+        <tr><td colspan="9" style="text-align:center;padding:30px;color:#9e9e98;">No fee records yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>
