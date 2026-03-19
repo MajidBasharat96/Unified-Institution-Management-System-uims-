@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}UIMS{% endblock %} — Unified Institution Management</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f5f3;
+  --surface: #ffffff;
+  --border: #e4e4e0;
+  --border-soft: #eeeeea;
+  --text: #1a1a18;
+  --text-muted: #6b6b65;
+  --text-faint: #9e9e98;
+  --accent-h: #1d4ed8;
+  --accent-h-soft: #eff6ff;
+  --accent-c: #0f766e;
+  --accent-c-soft: #f0fdfa;
+  --accent-warn: #b45309;
+  --accent-warn-soft: #fffbeb;
+  --accent-danger: #dc2626;
+  --accent-danger-soft: #fef2f2;
+  --accent-success: #15803d;
+  --accent-success-soft: #f0fdf4;
+  --sidebar-w: 240px;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+a { color: inherit; text-decoration: none; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w);
+  background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; z-index: 100; overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.sidebar-logo .wordmark {
+  font-size: 15px; font-weight: 600; letter-spacing: -0.3px; color: var(--text);
+}
+.sidebar-logo .tagline {
+  font-size: 11px; color: var(--text-faint); margin-top: 2px; font-family: 'DM Mono', monospace;
+}
+.sidebar-section { padding: 16px 12px 8px; }
+.sidebar-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-faint); padding: 0 8px; margin-bottom: 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 9px; padding: 7px 10px;
+  border-radius: 6px; color: var(--text-muted); font-size: 13.5px;
+  font-weight: 400; transition: all 0.12s; cursor: pointer; margin-bottom: 1px;
+}
+.nav-item:hover { background: var(--bg); color: var(--text); }
+.nav-item.active { background: var(--accent-h-soft); color: var(--accent-h); font-weight: 500; }
+.nav-item.active.college { background: var(--accent-c-soft); color: var(--accent-c); }
+.nav-icon { width: 16px; height: 16px; opacity: 0.7; flex-shrink: 0; }
+.nav-item.active .nav-icon { opacity: 1; }
+.sidebar-footer {
+  margin-top: auto; padding: 12px; border-top: 1px solid var(--border-soft);
+}
+.user-chip {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+  border-radius: 6px; background: var(--bg);
+}
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent-h); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; flex-shrink: 0;
+}
+.user-info .name { font-size: 12.5px; font-weight: 500; }
+.user-info .role { font-size: 11px; color: var(--text-faint); }
+.logout-btn {
+  display: block; margin-top: 8px; padding: 6px 10px; border-radius: 6px;
+  font-size: 12.5px; color: var(--text-muted); text-align: center;
+  border: 1px solid var(--border); transition: all 0.12s;
+}
+.logout-btn:hover { background: var(--accent-danger-soft); color: var(--accent-danger); border-color: var(--accent-danger); }
+
+/* ── MAIN ── */
+.main { margin-left: var(--sidebar-w); min-height: 100vh; }
+.topbar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 14px 28px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar-title { font-size: 15px; font-weight: 600; }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.content { padding: 28px; }
+
+/* ── MESSAGES ── */
+.messages { margin-bottom: 20px; }
+.msg {
+  padding: 10px 14px; border-radius: var(--radius); font-size: 13.5px;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+}
+.msg.success { background: var(--accent-success-soft); color: var(--accent-success); border: 1px solid #bbf7d0; }
+.msg.error { background: var(--accent-danger-soft); color: var(--accent-danger); border: 1px solid #fecaca; }
+.msg.warning { background: var(--accent-warn-soft); color: var(--accent-warn); border: 1px solid #fde68a; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.card-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border-soft);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title { font-size: 14px; font-weight: 600; }
+.card-body { padding: 20px; }
+
+/* ── STAT CARDS ── */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow);
+}
+.stat-label { font-size: 11.5px; color: var(--text-faint); font-weight: 500; letter-spacing: 0.02em; margin-bottom: 6px; }
+.stat-value { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; line-height: 1; }
+.stat-meta { font-size: 11px; color: var(--text-faint); margin-top: 4px; }
+.stat-card.blue .stat-value { color: var(--accent-h); }
+.stat-card.green .stat-value { color: var(--accent-c); }
+.stat-card.amber .stat-value { color: var(--accent-warn); }
+.stat-card.red .stat-value { color: var(--accent-danger); }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+thead th {
+  text-align: left; padding: 10px 14px; font-size: 11.5px; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint);
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border-soft); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--bg); }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex; align-items: center; padding: 2px 8px;
+  border-radius: 20px; font-size: 11.5px; font-weight: 500; white-space: nowrap;
+}
+.badge.green { background: var(--accent-success-soft); color: var(--accent-success); }
+.badge.blue { background: var(--accent-h-soft); color: var(--accent-h); }
+.badge.amber { background: var(--accent-warn-soft); color: var(--accent-warn); }
+.badge.red { background: var(--accent-danger-soft); color: var(--accent-danger); }
+.badge.gray { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+.badge.teal { background: var(--accent-c-soft); color: var(--accent-c); }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
+  border-radius: 6px; font-size: 13.5px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  transition: all 0.12s; line-height: 1;
+}
+.btn:hover { background: var(--bg); }
+.btn.primary { background: var(--accent-h); color: #fff; border-color: var(--accent-h); }
+.btn.primary:hover { background: #1e40af; border-color: #1e40af; }
+.btn.success { background: var(--accent-c); color: #fff; border-color: var(--accent-c); }
+.btn.success:hover { background: #0d6562; }
+.btn.danger { background: var(--accent-danger); color: #fff; border-color: var(--accent-danger); }
+.btn.sm { padding: 4px 10px; font-size: 12px; }
+
+/* ── FORMS ── */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+label { font-size: 12.5px; font-weight: 500; color: var(--text-muted); }
+input, select, textarea {
+  padding: 8px 11px; border: 1px solid var(--border); border-radius: 6px;
+  font-size: 13.5px; font-family: inherit; background: var(--surface); color: var(--text);
+  transition: border-color 0.12s; outline: none;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent-h); }
+textarea { resize: vertical; min-height: 80px; }
+.form-actions {
+  display: flex; gap: 10px; align-items: center;
+  padding-top: 20px; border-top: 1px solid var(--border-soft); margin-top: 20px;
+}
+
+/* ── SEARCH BAR ── */
+.search-bar {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+}
+.search-bar input { flex: 1; max-width: 320px; }
+
+/* ── SECTION DIVIDER ── */
+.section-divider {
+  display: flex; align-items: center; gap: 10px; margin: 24px 0 16px;
+}
+.section-divider .label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-faint); white-space: nowrap;
+}
+.section-divider::before, .section-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border-soft);
+}
+
+/* ── DETAIL GRID ── */
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+.detail-item .dl { font-size: 11.5px; color: var(--text-faint); margin-bottom: 3px; }
+.detail-item .dd { font-size: 14px; font-weight: 500; }
+
+/* ── HOSPITAL / COLLEGE COLOR CODING ── */
+.sidebar-section.hospital .sidebar-label { color: #1d4ed8; }
+.sidebar-section.college .sidebar-label { color: #0f766e; }
+.pill-h { background: #eff6ff; color: #1d4ed8; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.pill-c { background: #f0fdfa; color: #0f766e; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+</style>
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="wordmark">⊕ UIMS</div>
+    <div class="tagline">Unified Institution System</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Overview</div>
+    <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/>
+        <rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/>
+      </svg>
+      Dashboard
+    </a>
+  </div>
+
+  <div class="sidebar-section hospital">
+    <div class="sidebar-label">Hospital</div>
+    <a href="{% url 'patient_list' %}" class="nav-item {% if 'patient' in request.resolver_match.url_name %}active{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/>
+      </svg>
+      Patients
+    </a>
+    <a href="{% url 'doctor_list' %}" class="nav-item {% if 'doctor' in request.resolver_match.url_name %}active{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M8 1v6M5 4h6"/><circle cx="8" cy="11" r="4"/>
+      </svg>
+      Doctors & Staff
+    </a>
+    <a href="{% url 'appointment_list' %}" class="nav-item {% if 'appointment' in request.resolver_match.url_name %}active{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="3" width="14" height="12" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/>
+      </svg>
+      Appointments
+    </a>
+    <a href="{% url 'medicine_list' %}" class="nav-item {% if 'medicine' in request.resolver_match.url_name %}active{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="1" width="12" height="14" rx="1.5"/><path d="M5 5h6M5 8h4M5 11h3"/>
+      </svg>
+      Pharmacy
+    </a>
+    <a href="{% url 'bill_list' %}" class="nav-item {% if 'bill' in request.resolver_match.url_name %}active{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 2h12v12L11 12l-3 2-3-2-3 2V2z"/>
+      </svg>
+      Billing
+    </a>
+  </div>
+
+  <div class="sidebar-section college">
+    <div class="sidebar-label">College</div>
+    <a href="{% url 'student_list' %}" class="nav-item college {% if 'student' in request.resolver_match.url_name %}active college{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M8 1L1 5l7 4 7-4-7-4z"/><path d="M1 5v5M4 6.5v4.5a6 3 0 008 0V6.5"/>
+      </svg>
+      Students
+    </a>
+    <a href="{% url 'teacher_list' %}" class="nav-item {% if 'teacher' in request.resolver_match.url_name %}active college{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="6" cy="5" r="3"/><path d="M1 14c0-2.8 2.2-5 5-5M10 9l5 3-5 3V9z"/>
+      </svg>
+      Faculty
+    </a>
+    <a href="{% url 'course_list' %}" class="nav-item {% if 'course' in request.resolver_match.url_name %}active college{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 3h12v10H2z"/><path d="M5 3V1M11 3V1M2 7h12"/>
+      </svg>
+      Courses
+    </a>
+    <a href="{% url 'attendance_list' %}" class="nav-item {% if 'attendance' in request.resolver_match.url_name %}active college{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M13 3L6 10 3 7"/><rect x="1" y="1" width="14" height="14" rx="1.5"/>
+      </svg>
+      Attendance
+    </a>
+    <a href="{% url 'grade_list' %}" class="nav-item {% if 'grade' in request.resolver_match.url_name %}active college{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="8" r="7"/><path d="M5.5 8.5L7 10l3.5-4"/>
+      </svg>
+      Grades
+    </a>
+    <a href="{% url 'fee_list' %}" class="nav-item {% if 'fee' in request.resolver_match.url_name %}active college{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="8" cy="8" r="7"/><path d="M8 4v1.5M8 10.5V12M6 6c0-1.1.9-2 2-2s2 .9 2 2-2 2-2 2-2 .9-2 2 .9 2 2 2 2-.9 2-2"/>
+      </svg>
+      Fees & Finance
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar">{{ user.first_name.0|default:user.username.0|upper }}</div>
+      <div class="user-info">
+        <div class="name">{{ user.get_full_name|default:user.username }}</div>
+        <div class="role">{{ user.profile.get_role_display|default:"Administrator" }}</div>
+      </div>
+    </div>
+    <a href="{% url 'logout' %}" class="logout-btn">Sign out</a>
+  </div>
+</aside>
+{% endif %}
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+    <div class="topbar-actions">{% block topbar_actions %}{% endblock %}</div>
+  </div>
+  <div class="content">
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div class="msg {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+</body>
+</html>

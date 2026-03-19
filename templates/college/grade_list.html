@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Grades{% endblock %}
+{% block page_title %}Grades{% endblock %}
+{% block topbar_actions %}<a href="{% url 'grade_create' %}" class="btn success">+ Enter Grade</a>{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header"><div class="card-title">Grade Records ({{ grades.count }})</div></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Student</th><th>Course</th><th>Mid</th><th>Final</th><th>Assignment</th><th>Total</th><th>Grade</th></tr></thead>
+      <tbody>
+        {% for g in grades %}
+        <tr>
+          <td><strong>{{ g.student.first_name }} {{ g.student.last_name }}</strong><br><span style="font-size:11px;color:#6b6b65;">{{ g.student.roll_number }}</span></td>
+          <td>{{ g.course.code }}<br><span style="font-size:11px;color:#6b6b65;">{{ g.course.name|truncatechars:22 }}</span></td>
+          <td>{{ g.mid_marks }}</td>
+          <td>{{ g.final_marks }}</td>
+          <td>{{ g.assignment_marks }}</td>
+          <td><strong>{{ g.total_marks }}</strong></td>
+          <td>
+            {% if g.grade == 'F' %}<span class="badge red" style="font-size:13px;">F</span>
+            {% elif g.grade == 'A+' or g.grade == 'A' %}<span class="badge green" style="font-size:13px;">{{ g.grade }}</span>
+            {% elif g.grade == 'B+' or g.grade == 'B' %}<span class="badge blue" style="font-size:13px;">{{ g.grade }}</span>
+            {% else %}<span class="badge amber" style="font-size:13px;">{{ g.grade }}</span>{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" style="text-align:center;padding:30px;color:#9e9e98;">No grades yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

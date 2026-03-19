@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block topbar_actions %}<a href="{% url 'course_list' %}" class="btn">← Back</a>{% endblock %}
+{% block content %}
+<div class="card" style="max-width:760px;">
+  <div class="card-header"><div class="card-title">{{ title }}</div></div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-group"><label>Course Code *</label><input type="text" name="code" placeholder="e.g. CS-301" required></div>
+        <div class="form-group"><label>Course Name *</label><input type="text" name="name" required></div>
+        <div class="form-group">
+          <label>Department *</label>
+          <select name="department" required>
+            <option value="">Select department</option>
+            {% for d in departments %}<option value="{{ d.pk }}">{{ d.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Assigned Teacher</label>
+          <select name="teacher">
+            <option value="">None / TBA</option>
+            {% for t in teachers %}<option value="{{ t.pk }}">{{ t.first_name }} {{ t.last_name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group"><label>Credit Hours</label><input type="number" name="credit_hours" value="3" min="1" max="6"></div>
+        <div class="form-group"><label>Semester</label><input type="number" name="semester" value="1" min="1" max="12"></div>
+        <div class="form-group full"><label>Description</label><textarea name="description" rows="3"></textarea></div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn success">Save Course</button>
+        <a href="{% url 'course_list' %}" class="btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

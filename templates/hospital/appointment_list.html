@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Appointments{% endblock %}
+{% block page_title %}Appointments{% endblock %}
+{% block topbar_actions %}<a href="{% url 'appointment_create' %}" class="btn primary">+ Schedule</a>{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header"><div class="card-title">All Appointments ({{ appointments.count }})</div></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Time</th><th>Reason</th><th>Status</th><th>Update</th></tr></thead>
+      <tbody>
+        {% for a in appointments %}
+        <tr>
+          <td><strong>{{ a.patient.first_name }} {{ a.patient.last_name }}</strong><br><span style="font-size:11px;color:#6b6b65;">{{ a.patient.patient_id }}</span></td>
+          <td>Dr. {{ a.doctor.first_name }} {{ a.doctor.last_name }}<br><span style="font-size:11px;color:#6b6b65;">{{ a.doctor.get_specialization_display }}</span></td>
+          <td style="font-family:'DM Mono',monospace;font-size:12px;">{{ a.appointment_date }}</td>
+          <td style="font-family:'DM Mono',monospace;font-size:12px;">{{ a.appointment_time }}</td>
+          <td style="font-size:12.5px;max-width:140px;">{{ a.reason|truncatechars:40|default:"—" }}</td>
+          <td>
+            {% if a.status == 'scheduled' %}<span class="badge blue">Scheduled</span>
+            {% elif a.status == 'completed' %}<span class="badge green">Completed</span>
+            {% elif a.status == 'cancelled' %}<span class="badge red">Cancelled</span>
+            {% else %}<span class="badge gray">{{ a.get_status_display }}</span>{% endif %}
+          </td>
+          <td>
+            <form method="post" action="{% url 'appointment_status' a.pk %}" style="display:flex;gap:4px;">
+              {% csrf_token %}
+              <select name="status" style="font-size:12px;padding:4px 6px;">
+                <option value="scheduled">Scheduled</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="no_show">No Show</option>
+              </select>
+              <button type="submit" class="btn sm">Set</button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" style="text-align:center;padding:30px;color:#9e9e98;">No appointments yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

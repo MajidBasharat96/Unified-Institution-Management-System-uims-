@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="section-divider"><span class="label">🏥 Hospital Overview</span></div>
+<div class="stats-grid">
+  <div class="stat-card blue">
+    <div class="stat-label">Total Patients</div>
+    <div class="stat-value">{{ total_patients }}</div>
+    <div class="stat-meta">Registered patients</div>
+  </div>
+  <div class="stat-card blue">
+    <div class="stat-label">Doctors & Staff</div>
+    <div class="stat-value">{{ total_doctors }}</div>
+    <div class="stat-meta">Active medical staff</div>
+  </div>
+  <div class="stat-card amber">
+    <div class="stat-label">Today's Appointments</div>
+    <div class="stat-value">{{ today_appointments }}</div>
+    <div class="stat-meta">Scheduled for today</div>
+  </div>
+</div>
+
+<div class="section-divider"><span class="label">🎓 College Overview</span></div>
+<div class="stats-grid">
+  <div class="stat-card green">
+    <div class="stat-label">Total Students</div>
+    <div class="stat-value">{{ total_students }}</div>
+    <div class="stat-meta">Enrolled students</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-label">Faculty Members</div>
+    <div class="stat-value">{{ total_teachers }}</div>
+    <div class="stat-meta">Teaching staff</div>
+  </div>
+  <div class="stat-card red">
+    <div class="stat-label">Pending Fees</div>
+    <div class="stat-value">{{ pending_fees }}</div>
+    <div class="stat-meta">Awaiting payment</div>
+  </div>
+</div>
+
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 8px;">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Recent Patients</div>
+      <a href="{% url 'patient_list' %}" class="btn sm">View all</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Blood</th></tr></thead>
+        <tbody>
+          {% for p in recent_patients %}
+          <tr>
+            <td><span class="badge blue">{{ p.patient_id }}</span></td>
+            <td><a href="{% url 'patient_detail' p.pk %}" style="color: #1d4ed8;">{{ p.first_name }} {{ p.last_name }}</a></td>
+            <td style="color:#6b6b65;">{{ p.phone }}</td>
+            <td>{% if p.blood_group %}<span class="badge red">{{ p.blood_group }}</span>{% else %}—{% endif %}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" style="text-align:center; color:#9e9e98; padding:20px;">No patients yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Recent Students</div>
+      <a href="{% url 'student_list' %}" class="btn sm">View all</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Roll No</th><th>Name</th><th>Semester</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for s in recent_students %}
+          <tr>
+            <td><span class="badge teal">{{ s.roll_number }}</span></td>
+            <td><a href="{% url 'student_detail' s.pk %}" style="color:#0f766e;">{{ s.first_name }} {{ s.last_name }}</a></td>
+            <td style="color:#6b6b65;">Sem {{ s.semester }}</td>
+            <td>
+              {% if s.status == 'active' %}<span class="badge green">Active</span>
+              {% else %}<span class="badge gray">{{ s.get_status_display }}</span>{% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" style="text-align:center; color:#9e9e98; padding:20px;">No students yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="grid-column: 1 / -1;">
+    <div class="card-header">
+      <div class="card-title">Recent Appointments</div>
+      <a href="{% url 'appointment_create' %}" class="btn primary sm">+ New Appointment</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for a in recent_appointments %}
+          <tr>
+            <td>{{ a.patient.first_name }} {{ a.patient.last_name }}</td>
+            <td>Dr. {{ a.doctor.first_name }} {{ a.doctor.last_name }}</td>
+            <td>{{ a.appointment_date }}</td>
+            <td style="font-family:'DM Mono',monospace;font-size:12px;">{{ a.appointment_time }}</td>
+            <td>
+              {% if a.status == 'scheduled' %}<span class="badge blue">Scheduled</span>
+              {% elif a.status == 'completed' %}<span class="badge green">Completed</span>
+              {% elif a.status == 'cancelled' %}<span class="badge red">Cancelled</span>
+              {% else %}<span class="badge gray">{{ a.get_status_display }}</span>{% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" style="text-align:center; color:#9e9e98; padding:20px;">No appointments yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

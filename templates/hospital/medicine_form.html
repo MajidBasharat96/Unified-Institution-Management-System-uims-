@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Add Medicine{% endblock %}
+{% block page_title %}Add Medicine{% endblock %}
+{% block topbar_actions %}<a href="{% url 'medicine_list' %}" class="btn">← Back</a>{% endblock %}
+{% block content %}
+<div class="card" style="max-width:700px;">
+  <div class="card-header"><div class="card-title">{{ title }}</div></div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-group"><label>Medicine Name *</label><input type="text" name="name" required></div>
+        <div class="form-group"><label>Generic Name</label><input type="text" name="generic_name"></div>
+        <div class="form-group">
+          <label>Category *</label>
+          <select name="category" required>
+            {% for val, label in categories %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group"><label>Manufacturer</label><input type="text" name="manufacturer"></div>
+        <div class="form-group"><label>Unit Price (PKR) *</label><input type="number" name="unit_price" step="0.01" required></div>
+        <div class="form-group"><label>Stock Quantity *</label><input type="number" name="stock_quantity" required></div>
+        <div class="form-group"><label>Expiry Date</label><input type="date" name="expiry_date"></div>
+        <div class="form-group"><label>Reorder Level</label><input type="number" name="reorder_level" value="10"></div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn primary">Add to Pharmacy</button>
+        <a href="{% url 'medicine_list' %}" class="btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Patients{% endblock %}
+{% block page_title %}Patients{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'patient_create' %}" class="btn primary">+ Register Patient</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">All Patients ({{ patients.count }})</div>
+    <form method="get" class="search-bar" style="margin:0;">
+      <input type="text" name="q" value="{{ query }}" placeholder="Search by name, ID, phone…" style="width:260px;">
+      <button type="submit" class="btn">Search</button>
+      {% if query %}<a href="{% url 'patient_list' %}" class="btn">Clear</a>{% endif %}
+    </form>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Patient ID</th><th>Name</th><th>Gender</th><th>DOB</th><th>Blood</th><th>Phone</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for p in patients %}
+        <tr>
+          <td><span class="badge blue">{{ p.patient_id }}</span></td>
+          <td><strong>{{ p.first_name }} {{ p.last_name }}</strong></td>
+          <td>{{ p.get_gender_display }}</td>
+          <td style="font-family:'DM Mono',monospace;font-size:12px;">{{ p.date_of_birth }}</td>
+          <td>{% if p.blood_group %}<span class="badge red">{{ p.blood_group }}</span>{% else %}—{% endif %}</td>
+          <td>{{ p.phone }}</td>
+          <td style="display:flex; gap:6px;">
+            <a href="{% url 'patient_detail' p.pk %}" class="btn sm">View</a>
+            <a href="{% url 'patient_edit' p.pk %}" class="btn sm">Edit</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" style="text-align:center;padding:30px;color:#9e9e98;">No patients found. <a href="{% url 'patient_create' %}" style="color:#1d4ed8;">Register one?</a></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}{{ patient }}{% endblock %}
+{% block page_title %}Patient Record{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'patient_edit' patient.pk %}" class="btn">Edit</a>
+<a href="{% url 'patient_list' %}" class="btn">← Back</a>
+{% endblock %}
+{% block content %}
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-header">
+    <div>
+      <span class="badge blue" style="margin-bottom:6px;">{{ patient.patient_id }}</span>
+      <div class="card-title" style="font-size:18px; margin-top:4px;">{{ patient.first_name }} {{ patient.last_name }}</div>
+    </div>
+    {% if patient.blood_group %}<span class="badge red" style="font-size:16px; padding:4px 12px;">{{ patient.blood_group }}</span>{% endif %}
+  </div>
+  <div class="card-body">
+    <div class="detail-grid">
+      <div class="detail-item"><div class="dl">Gender</div><div class="dd">{{ patient.get_gender_display }}</div></div>
+      <div class="detail-item"><div class="dl">Date of Birth</div><div class="dd">{{ patient.date_of_birth }}</div></div>
+      <div class="detail-item"><div class="dl">Phone</div><div class="dd">{{ patient.phone }}</div></div>
+      <div class="detail-item"><div class="dl">Email</div><div class="dd">{{ patient.email|default:"—" }}</div></div>
+      <div class="detail-item" style="grid-column:1/-1;"><div class="dl">Address</div><div class="dd">{{ patient.address }}</div></div>
+      <div class="detail-item"><div class="dl">Emergency Contact</div><div class="dd">{{ patient.emergency_contact|default:"—" }}</div></div>
+      <div class="detail-item"><div class="dl">Emergency Phone</div><div class="dd">{{ patient.emergency_phone|default:"—" }}</div></div>
+    </div>
+    {% if patient.medical_history %}
+    <div style="margin-top:16px; padding:14px; background:#fafafa; border-radius:6px; border:1px solid #e4e4e0;">
+      <div class="dl" style="margin-bottom:6px;">Medical History</div>
+      <div style="font-size:13.5px; line-height:1.7;">{{ patient.medical_history }}</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Appointments</div>
+      <a href="{% url 'appointment_create' %}" class="btn sm primary">+ New</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Doctor</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for a in appointments %}
+          <tr>
+            <td style="font-family:'DM Mono',monospace;font-size:12px;">{{ a.appointment_date }}</td>
+            <td>Dr. {{ a.doctor.last_name }}</td>
+            <td>
+              {% if a.status == 'completed' %}<span class="badge green">Done</span>
+              {% elif a.status == 'scheduled' %}<span class="badge blue">Scheduled</span>
+              {% else %}<span class="badge gray">{{ a.get_status_display }}</span>{% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" style="text-align:center;color:#9e9e98;padding:16px;">No appointments</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Billing</div>
+      <a href="{% url 'bill_create' %}" class="btn sm primary">+ Bill</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Bill #</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for b in bills %}
+          <tr>
+            <td><span class="badge gray">{{ b.bill_number }}</span></td>
+            <td>PKR {{ b.total_amount }}</td>
+            <td>
+              {% if b.status == 'paid' %}<span class="badge green">Paid</span>
+              {% elif b.status == 'pending' %}<span class="badge amber">Pending</span>
+              {% else %}<span class="badge gray">{{ b.get_status_display }}</span>{% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" style="text-align:center;color:#9e9e98;padding:16px;">No bills</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

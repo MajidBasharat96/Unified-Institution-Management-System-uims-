@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block topbar_actions %}<a href="{% url 'teacher_list' %}" class="btn">← Back</a>{% endblock %}
+{% block content %}
+<div class="card" style="max-width:800px;">
+  <div class="card-header"><div class="card-title">{{ title }}</div></div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-group"><label>First Name *</label><input type="text" name="first_name" required></div>
+        <div class="form-group"><label>Last Name *</label><input type="text" name="last_name" required></div>
+        <div class="form-group">
+          <label>Designation *</label>
+          <select name="designation" required>
+            {% for val, label in designations %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Department *</label>
+          <select name="department" required>
+            <option value="">Select department</option>
+            {% for d in departments %}<option value="{{ d.pk }}">{{ d.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group"><label>Email *</label><input type="email" name="email" required></div>
+        <div class="form-group"><label>Phone *</label><input type="text" name="phone" required></div>
+        <div class="form-group"><label>Qualification *</label><input type="text" name="qualification" placeholder="PhD, MPhil, MSc…" required></div>
+        <div class="form-group"><label>Joining Date *</label><input type="date" name="joining_date" required></div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn success">Add Faculty</button>
+        <a href="{% url 'teacher_list' %}" class="btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

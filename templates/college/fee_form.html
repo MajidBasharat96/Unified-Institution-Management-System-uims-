@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Add Fee Record{% endblock %}
+{% block page_title %}Add Fee Record{% endblock %}
+{% block topbar_actions %}<a href="{% url 'fee_list' %}" class="btn">← Back</a>{% endblock %}
+{% block content %}
+<div class="card" style="max-width:720px;">
+  <div class="card-header"><div class="card-title">{{ title }}</div></div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Student *</label>
+          <select name="student" required>
+            <option value="">Select student</option>
+            {% for s in students %}<option value="{{ s.pk }}">{{ s.roll_number }} — {{ s.first_name }} {{ s.last_name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Fee Type *</label>
+          <select name="fee_type" required>
+            {% for val, label in fee_types %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group"><label>Semester</label><input type="number" name="semester" value="1" min="1" max="12"></div>
+        <div class="form-group"><label>Total Amount (PKR) *</label><input type="number" name="amount" step="0.01" required></div>
+        <div class="form-group"><label>Paid Amount (PKR)</label><input type="number" name="paid_amount" step="0.01" value="0"></div>
+        <div class="form-group"><label>Due Date *</label><input type="date" name="due_date" required></div>
+        <div class="form-group"><label>Payment Date</label><input type="date" name="payment_date"></div>
+        <div class="form-group full"><label>Remarks</label><textarea name="remarks" rows="2"></textarea></div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn success">Save Fee Record</button>
+        <a href="{% url 'fee_list' %}" class="btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

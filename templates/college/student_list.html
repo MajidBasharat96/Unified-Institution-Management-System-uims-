@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Students{% endblock %}
+{% block page_title %}Students{% endblock %}
+{% block topbar_actions %}<a href="{% url 'student_create' %}" class="btn success">+ Enroll Student</a>{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">All Students ({{ students.count }})</div>
+    <form method="get" style="display:flex;gap:8px;margin:0;">
+      <input type="text" name="q" value="{{ query }}" placeholder="Search by name, roll no…" style="width:240px;">
+      <button type="submit" class="btn">Search</button>
+    </form>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Roll No</th><th>Name</th><th>Department</th><th>Semester</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td><span class="badge teal">{{ s.roll_number }}</span></td>
+          <td><a href="{% url 'student_detail' s.pk %}" style="color:#0f766e;font-weight:500;">{{ s.first_name }} {{ s.last_name }}</a></td>
+          <td style="font-size:12.5px;">{{ s.department.name|default:"—" }}</td>
+          <td>Semester {{ s.semester }}</td>
+          <td>{{ s.phone }}</td>
+          <td>
+            {% if s.status == 'active' %}<span class="badge green">Active</span>
+            {% elif s.status == 'graduated' %}<span class="badge blue">Graduated</span>
+            {% elif s.status == 'suspended' %}<span class="badge red">Suspended</span>
+            {% else %}<span class="badge gray">{{ s.get_status_display }}</span>{% endif %}
+          </td>
+          <td style="display:flex;gap:6px;">
+            <a href="{% url 'student_detail' s.pk %}" class="btn sm">View</a>
+            <a href="{% url 'student_edit' s.pk %}" class="btn sm">Edit</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" style="text-align:center;padding:30px;color:#9e9e98;">No students yet. <a href="{% url 'student_create' %}" style="color:#0f766e;">Enroll one?</a></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

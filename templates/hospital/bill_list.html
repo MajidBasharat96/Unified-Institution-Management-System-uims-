@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Billing{% endblock %}
+{% block page_title %}Billing{% endblock %}
+{% block topbar_actions %}<a href="{% url 'bill_create' %}" class="btn primary">+ Create Bill</a>{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header"><div class="card-title">All Bills ({{ bills.count }})</div></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Bill #</th><th>Patient</th><th>Total</th><th>Paid</th><th>Balance</th><th>Date</th><th>Status</th><th>View</th></tr></thead>
+      <tbody>
+        {% for b in bills %}
+        <tr>
+          <td><span class="badge gray">{{ b.bill_number }}</span></td>
+          <td><strong>{{ b.patient.first_name }} {{ b.patient.last_name }}</strong></td>
+          <td>PKR {{ b.total_amount }}</td>
+          <td style="color:#15803d;">PKR {{ b.paid_amount }}</td>
+          <td style="color:{% if b.balance > 0 %}#dc2626{% else %}#15803d{% endif %};">PKR {{ b.balance }}</td>
+          <td style="font-family:'DM Mono',monospace;font-size:12px;">{{ b.bill_date }}</td>
+          <td>
+            {% if b.status == 'paid' %}<span class="badge green">Paid</span>
+            {% elif b.status == 'pending' %}<span class="badge amber">Pending</span>
+            {% elif b.status == 'partial' %}<span class="badge blue">Partial</span>
+            {% else %}<span class="badge red">Cancelled</span>{% endif %}
+          </td>
+          <td><a href="{% url 'bill_detail' b.pk %}" class="btn sm">View</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" style="text-align:center;padding:30px;color:#9e9e98;">No bills yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
